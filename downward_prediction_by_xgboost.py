@@ -115,39 +115,3 @@ y_proba = model.predict_proba(X_test)[:,1]
 print("\nClassification report：")
 print(classification_report(y_test, y_pred, target_names=['normal', 'downward']))
 print(f"AUC-ROC: {roc_auc_score(y_test, y_proba):.4f}")
-
-aapl_data = yf.download("BABA", start="2020-01-01", end="2025-01-01")
-aapl_data.columns = [col[0] for col in aapl_data.columns]
-
-# 計算技術指標（請確保 compute_all_indicators 與訓練時一致）
-ta_aapl = compute_all_indicators(aapl_data)
-
-# 與訓練資料相同的處理
-ta_aapl['Typical_Price'] = (ta_aapl['High'] + ta_aapl['Low'] + ta_aapl['Close']) / 3
-ta_aapl['Pct_Change'] = ta_aapl['Typical_Price'].pct_change()
-ta_aapl['Downward_Trend'] = (ta_aapl['Pct_Change'].shift(-1) < -0.001).astype(int)
-aapl_clean = ta_aapl.dropna().copy()
-
-aapl_clean = preprocess_data(aapl_clean)
-
-X_aapl = aapl_clean[features]
-
-y_aapl_true = aapl_clean['Downward_Trend'].values
-
-# 使用預先訓練好的模型進行預測
-y_aapl_pred = model.predict(X_aapl)
-y_aapl_proba = model.predict_proba(X_aapl)[:, 1]
-
-joblib.dump(model, 'downward_trend_pred_model_V1.pkl')
-
-# 將預測結果加入數據框，方便觀察趨勢
-aapl_clean['Predicted_Downward'] = y_aapl_pred
-aapl_clean['Downward_Proba'] = y_aapl_proba
-
-print("\n分類報告：")
-print(classification_report(y_aapl_true, y_aapl_pred, target_names=['normal', 'downward']))
-print(f"AUC-ROC: {roc_auc_score(y_aapl_true, y_aapl_proba):.4f}")
-
-
-# 10. 將合併後的結果輸出為 CSV
-aapl_clean.to_csv('aapl_with_predictions.csv', index=True)
