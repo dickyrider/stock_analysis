@@ -1,0 +1,37 @@
+import yfinance as yf
+import pandas as pd
+from functools import reduce
+import os
+
+#accessing data
+data_path = '/Users/dicky/Desktop/data/Fred'
+
+for filename in os.listdir(data_path):
+    if filename[:len('T10Y2Y.csv')] == 'T10Y2Y.csv':
+        #10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity
+        T10Y2Y_data = os.path.join(data_path,filename)
+    if filename[:len('DFF')] == 'DFF':
+        #Effective Federal Funds Rate
+        dff_data = os.path.join(data_path,filename)
+
+T10Y2Y_df = pd.read_csv(T10Y2Y_data, parse_dates=["observation_date"])
+dff_df = pd.read_csv(dff_data, parse_dates=["observation_date"])
+
+#access data from yfinance
+start_day = "2014-01-01"
+end_day = "2025-01-01"
+nvda_df = yf.download("NVDA", start=start_day, end=end_day)
+nvda_df.reset_index(inplace=True)  
+
+etf_tickers = ["DBC", "XLE", "GDX", "TIP"]
+etf_data = yf.download(etf_tickers, start=start_day, end=end_day)
+etf_close_df = etf_data.iloc[:, :len(etf_tickers)]
+etf_close_df.columns = etf_close_df.columns.get_level_values(1)
+etf_close_df
+
+# 先確保日期欄位的名稱一致，可以將 dff_df 的 "observation_date" 改名為 "Date"
+dff_df.rename(columns={"observation_date": "Date"}, inplace=True)
+
+# 將所有 DataFrame 放入一個列表中，並根據共用的 "Date" 欄位一次合併
+data_frames = [nvda_df, dff_df, T10Y2Y_df]
+merged_df = reduce(lambda left, right: pd.merge(left, right, on="Date", how="left"), data_frames)
