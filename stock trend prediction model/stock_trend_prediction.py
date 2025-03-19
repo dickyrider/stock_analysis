@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import os
 
 #accessing data
-data_path = 'Z:/公司_結算部_Personal Folder/Dicky Fok/data'
+data_path = #path
 
 for filename in os.listdir(data_path):
     if filename[:len('T10Y2Y.csv')] == 'T10Y2Y.csv':
@@ -60,14 +60,13 @@ spy_dataset_df['MA50_200_diff'] = spy_dataset_df['spy_MA50'] - spy_dataset_df['s
 # Merge all dataframe
 data_frames = [stock_df, dff_df, T10Y2Y_df, etf_close_df, spy_dataset_df]
 merged_data_df = reduce(lambda left, right: pd.merge(left, right, on="Date", how="left"), data_frames)
-merged_data_df.to_csv("Z:/公司_結算部_Personal Folder/Dicky Fok/data/merged_data.csv", index=False)
 
 all_data = compute_all_indicators(merged_data_df)
 
 # Label data
 labeled_data_df = ctl_label(all_data)
 labeled_data_df.set_index('Date', inplace=True)
-labeled_data_df.to_csv("Z:/公司_結算部_Personal Folder/Dicky Fok/data/labeled_data.csv", index=False)
+labeled_data_df.to_csv(#path, index=False)
 
 clean_data_df = labeled_data_df.dropna().copy()
 
