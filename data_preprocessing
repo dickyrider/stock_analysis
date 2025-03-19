@@ -39,10 +39,11 @@ spy_df.reset_index(inplace=True)
 spy_df = spy_df.rename(columns={'Close': 'spy_Close'})
 spy_dataset_df =  spy_df.iloc[:, :2]
 
+# Calculate moving average and the difference
 spy_dataset_df['spy_MA20'] = spy_dataset_df['spy_Close'].rolling(window=20).mean()
 spy_dataset_df['spy_MA50'] = spy_dataset_df['spy_Close'].rolling(window=50).mean()
 spy_dataset_df['spy_MA200'] = spy_dataset_df['spy_Close'].rolling(window=200).mean()
-spy_dataset_df['MA20_50_diff'] = spy_dataset_df['spy_MA20'] - spy_dataset_df['spy_MA50']    # MA20 與 MA50 的差值
+spy_dataset_df['MA20_50_diff'] = spy_dataset_df['spy_MA20'] - spy_dataset_df['spy_MA50']    
 spy_dataset_df['MA50_200_diff'] = spy_dataset_df['spy_MA50'] - spy_dataset_df['spy_MA200'] 
 
 
