@@ -32,7 +32,7 @@ dff_df.rename(columns={"observation_date": "Date"}, inplace=True)
 #access data from yfinance
 start_day = "2012-01-01"
 end_day = "2025-03-15"
-ticker = 'AMD'
+ticker = 'NVDA'
 stock_df = yf.download(ticker, start=start_day, end=end_day)
 stock_df.columns = [col[0] for col in stock_df.columns]
 stock_df.reset_index(inplace=True)  
@@ -114,19 +114,22 @@ X_train, y_train = train_data[features], train_data[target]
 X_test, y_test = test_data[features], test_data[target]
 
 
-smote = SMOTE(random_state=42)
+smote = SMOTE(random_state=42, sampling_strategy=0.5, k_neighbors=3)
+
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
+X_train, y_train = X_train_resampled, y_train_resampled
 
 #Initialize the XGBClassifier for binary classification.
 model = xgb.XGBClassifier(
     objective='binary:logistic',
-    scale_pos_weight=1.5,
-    max_depth=4,
+    scale_pos_weight=1,
+    max_depth=5,
     learning_rate=0.05,
     subsample=0.7,
-    colsample_bytree=0.7,
+    colsample_bytree=0.8,
     reg_alpha=1,
-    reg_lambda=1,
+    reg_lambda=0.8,
     eval_metric='logloss',
     tree_method='hist',
     n_estimators=200,
